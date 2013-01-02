@@ -22,6 +22,7 @@ import com.yahoo.ycsb.*;
 import com.yahoo.ycsb.generator.CounterGenerator;
 import com.yahoo.ycsb.generator.DiscreteGenerator;
 import com.yahoo.ycsb.generator.ExponentialGenerator;
+import com.yahoo.ycsb.generator.FocusedZipfianGenerator;
 import com.yahoo.ycsb.generator.Generator;
 import com.yahoo.ycsb.generator.ConstantIntegerGenerator;
 import com.yahoo.ycsb.generator.HotspotIntegerGenerator;
@@ -323,6 +324,9 @@ public class CoreWorkload extends Workload
 		readallfields=Boolean.parseBoolean(p.getProperty(READ_ALL_FIELDS_PROPERTY,READ_ALL_FIELDS_PROPERTY_DEFAULT));
 		writeallfields=Boolean.parseBoolean(p.getProperty(WRITE_ALL_FIELDS_PROPERTY,WRITE_ALL_FIELDS_PROPERTY_DEFAULT));
 		
+		int clientid = Integer.parseInt(p.getProperty("clientid","0"));
+		int clientcount = Integer.parseInt(p.getProperty("clientcount","1"));
+		
 		if (p.getProperty(INSERT_ORDER_PROPERTY,INSERT_ORDER_PROPERTY_DEFAULT).compareTo("hashed")==0)
 		{
 			orderedinserts=false;
@@ -385,6 +389,10 @@ public class CoreWorkload extends Workload
 			int expectednewkeys=(int)(((double)opcount)*insertproportion*2.0); //2 is fudge factor
 			
 			keychooser=new ScrambledZipfianGenerator(recordcount+expectednewkeys);
+		}
+		else if (requestdistrib.compareTo("focusedzipfian")==0)
+		{
+			keychooser=new FocusedZipfianGenerator(0, recordcount, clientid, clientcount);
 		}
 		else if (requestdistrib.compareTo("latest")==0)
 		{
