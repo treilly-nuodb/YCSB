@@ -25,12 +25,16 @@ import java.util.*;
 import com.yahoo.ycsb.measurements.Measurements;
 import com.yahoo.ycsb.measurements.exporter.MeasurementsExporter;
 import com.yahoo.ycsb.measurements.exporter.TextMeasurementsExporter;
+import com.yahoo.ycsb.statusreporter.StatusReporter;
 
 //import org.apache.log4j.BasicConfigurator;
 
 /**
  * A thread to periodically show the status of the experiment, to reassure you that progress is being made.
- * 
+ * Launched only if the "status" flag (-s) is specified on the command line.
+ * YCSB param "statusinterval" can be used to override the default status reporting interval of 10000 milliseconds.
+ * By default status messages are printed to stdout; YCSB param "statusreporter" specifies an optional plugin to 
+ * route status information to some additional destination.
  * @author cooperb
  *
  */
@@ -39,17 +43,40 @@ class StatusThread extends Thread
 	Vector<Thread> _threads;
 	String _label;
 	boolean _standardstatus;
+	long _reportInterval;
+	StatusReporter _reporter;
 	
 	/**
 	 * The interval for reporting status.
 	 */
 	public static final long sleeptime=10000;
 
-	public StatusThread(Vector<Thread> threads, String label, boolean standardstatus)
+	public StatusThread(Vector<Thread> threads, String label, boolean standardstatus, Properties props)
 	{
 		_threads=threads;
 		_label=label;
 		_standardstatus=standardstatus;
+		if (props.containsKey("statusinterval"))
+		{
+		    _reportInterval=Long.parseLong(props.getProperty("statusinterval"));
+		}
+		else
+		    _reportInterval=sleeptime;
+		if (props.containsKey("statusreporter"))
+		{
+		    String reporterStr=props.getProperty("statusreporter");
+          try
+            {
+              _reporter = (StatusReporter) Class.forName(reporterStr).getConstructor().newInstance();
+              _reporter.configure(props);
+            } catch (Exception e)
+            {
+                System.err.println("Could not find status reporter " + reporterStr + ", ignoring custom statusreporter.");
+                _reporter = null;
+            }
+		}
+		else
+		    _reporter=null;
 	}
 
 	/**
@@ -94,34 +121,44 @@ class StatusThread extends Thread
 			
 			DecimalFormat d = new DecimalFormat("#.##");
 			
+			// getSummary() clears counters, so it can be called only once per loop
+			String measurementSummary=Measurements.getMeasurements().getSummary();
+			
 			if (totalops==0)
 			{
-				System.err.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+Measurements.getMeasurements().getSummary());
+				System.err.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+measurementSummary);
 			}
 			else
 			{
-				System.err.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+d.format(curthroughput)+" current ops/sec; "+Measurements.getMeasurements().getSummary());
+				System.err.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+d.format(curthroughput)+" current ops/sec; "+measurementSummary);
 			}
 
 			if (_standardstatus)
 			{
 			if (totalops==0)
 			{
-				System.out.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+Measurements.getMeasurements().getSummary());
+				System.out.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+measurementSummary);
 			}
 			else
 			{
-				System.out.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+d.format(curthroughput)+" current ops/sec; "+Measurements.getMeasurements().getSummary());
+				System.out.println(_label+" "+(interval/1000)+" sec: "+totalops+" operations; "+d.format(curthroughput)+" current ops/sec; "+ measurementSummary);
 			}
 			}
 
+			if (_reporter != null)
+			{
+			    _reporter.report(interval, totalops, curthroughput, measurementSummary);
+			}
 			try
 			{
-				sleep(sleeptime);
+				sleep(_reportInterval);
 			}
 			catch (InterruptedException e)
 			{
-				//do nothing
+				if (_reporter != null)
+				{
+				    _reporter.close();
+				}
 			}
 
 		}
@@ -684,7 +721,7 @@ public class Client
 
 		//run the workload
 
-		System.err.println("Starting test.");
+		System.err.println("Starting test...");
 
 		int opcount;
 		if (dotransactions)
@@ -733,7 +770,7 @@ public class Client
 			{
 				standardstatus=true;
 			}	
-			statusthread=new StatusThread(threads,label,standardstatus);
+			statusthread=new StatusThread(threads,label,standardstatus,props);
 			statusthread.start();
 		}
 
