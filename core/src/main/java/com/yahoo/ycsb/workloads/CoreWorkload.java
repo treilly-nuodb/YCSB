@@ -394,7 +394,11 @@ public class CoreWorkload extends Workload
 		}
 		else if (requestdistrib.compareTo("focusedzipfian")==0)
 		{
-			keychooser=new FocusedZipfianGenerator(0, recordcount, clientid, clientcount);
+			keychooser=new FocusedZipfianGenerator(recordcount, clientid, clientcount);
+		}
+		else if (requestdistrib.compareTo("focusedzipfianpartitioned")==0)
+		{
+			keychooser=new FocusedZipfianGenerator(recordcount, clientid, clientcount, true);
 		}
 		else if (requestdistrib.compareTo("latest")==0)
 		{
