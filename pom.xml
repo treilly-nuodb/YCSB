@@ -98,13 +98,13 @@
           <configLocation>checkstyle.xml</configLocation>
         </configuration>
         <executions>
-          <execution>
+          <!--execution>
           <id>validate</id>
             <phase>validate</phase>
             <goals>
               <goal>checkstyle</goal>
             </goals>
-          </execution>
+          </execution-->
         </executions>
       </plugin>
     </plugins>
