@@ -1,5 +1,5 @@
-Yahoo! Cloud System Benchmark (YCSB)
-====================================
+
+This is a fork of the Yahoo YCSB to enable handling of larger tables.
 
 Links
 -----
