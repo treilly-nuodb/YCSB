@@ -1,13 +1,11 @@
 package com.yahoo.ycsb.generator;
 
-import com.yahoo.ycsb.Utils;
-
 /**
  * An extension of the zipfian genarator that focuses the hotspots on the center of fractions of the
  * keyspace.   Centering is acheived by adding an centered offset to the zipfian value and treating odd/even 
  * as +/- the center.
  */
-public class FocusedZipfianGenerator extends IntegerGenerator 
+public class FocusedZipfianGenerator extends LongGenerator 
 {
 	ZipfianGenerator gen;
 	long _min,_max,_itemcount,_offset;
@@ -27,14 +25,6 @@ public class FocusedZipfianGenerator extends IntegerGenerator
 	/**************************************************************************************************/
 	
 	/**
-	 * Return the next int in the sequence.
-	 */
-	@Override
-	public int nextInt() {
-		return (int)nextLong();
-	}
-
-	/**
 	 * Return the next long in the sequence.
 	 */
 	public long nextLong()
@@ -48,7 +38,7 @@ public class FocusedZipfianGenerator extends IntegerGenerator
 		// since we spread odd/even up/down we must divide by two to avoid holes.
 		ret /= 2;
 		ret=_min+(ret+_offset)%_itemcount;
-		setLastInt((int)ret);
+		setLastLong(ret);
 		return ret;
 	}
 
