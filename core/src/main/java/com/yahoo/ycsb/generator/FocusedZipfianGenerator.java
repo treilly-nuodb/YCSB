@@ -1,9 +1,5 @@
 package com.yahoo.ycsb.generator;
 
-import java.util.ArrayList;
-
-import com.yahoo.ycsb.Utils;
-
 /**
  * An extension of the zipfian genarator that focuses the hotspots on the center of fractions of the
  * keyspace.   Centering is acheived by adding an centered offset to the zipfian value and treating odd/even 
@@ -47,7 +43,7 @@ public class FocusedZipfianGenerator extends LongGenerator
 	/**************************************************************************************************/
 	
 	/**
-	 * Return the next int in the sequence.
+	 * Return the next int in the sequence (kept for backwards compatibility).
 	 */
 	public int nextInt() {
 		return (int)nextLong();
