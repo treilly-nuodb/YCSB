@@ -177,10 +177,10 @@ class ClientThread extends Thread
 	DB _db;
 	boolean _dotransactions;
 	Workload _workload;
-	int _opcount;
+	long _opcount;
 	double _target;
 
-	int _opsdone;
+	long _opsdone;
 	int _threadid;
 	int _threadcount;
 	Object _workloadstate;
@@ -199,7 +199,7 @@ class ClientThread extends Thread
 	 * @param opcount the number of operations (transactions or inserts) to do
 	 * @param targetperthreadperms target number of operations per thread per ms
 	 */
-	public ClientThread(DB db, boolean dotransactions, Workload workload, int threadid, int threadcount, Properties props, int opcount, double targetperthreadperms)
+	public ClientThread(DB db, boolean dotransactions, Workload workload, int threadid, int threadcount, Properties props, long opcount, double targetperthreadperms)
 	{
 		//TODO: consider removing threadcount and threadid
 		_db=db;
@@ -214,7 +214,7 @@ class ClientThread extends Thread
 		//System.out.println("Interval = "+interval);
 	}
 
-	public int getOpsDone()
+	public long getOpsDone()
 	{
 		return _opsdone;
 	}
@@ -723,20 +723,20 @@ public class Client
 
 		System.err.println("Starting test...");
 
-		int opcount;
+		long opcount;
 		if (dotransactions)
 		{
-			opcount=Integer.parseInt(props.getProperty(OPERATION_COUNT_PROPERTY,"0"));
+			opcount=Long.parseLong(props.getProperty(OPERATION_COUNT_PROPERTY,"0"));
 		}
 		else
 		{
 			if (props.containsKey(INSERT_COUNT_PROPERTY))
 			{
-				opcount=Integer.parseInt(props.getProperty(INSERT_COUNT_PROPERTY,"0"));
+				opcount=Long.parseLong(props.getProperty(INSERT_COUNT_PROPERTY,"0"));
 			}
 			else
 			{
-				opcount=Integer.parseInt(props.getProperty(RECORD_COUNT_PROPERTY,"0"));
+				opcount=Long.parseLong(props.getProperty(RECORD_COUNT_PROPERTY,"0"));
 			}
 		}
 
