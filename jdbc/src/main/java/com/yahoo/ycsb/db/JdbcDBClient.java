@@ -412,6 +412,8 @@ public class JdbcDBClient extends DB implements JdbcDBClientConstants {
     }
 	}
 
+    int batchCount = 0;
+    int batchSize = 550;
 	@Override
 	public int insert(String tableName, String key, HashMap<String, ByteIterator> values) {
 	  if (tableName == null) {
@@ -433,7 +435,17 @@ public class JdbcDBClient extends DB implements JdbcDBClientConstants {
         String field = entry.getValue().toString();
         insertStatement.setString(index++, field);
       }
-      int result = insertStatement.executeUpdate();
+      //      int result = insertStatement.executeUpdate();
+
+      int result = 1;
+      if (++batchCount % batchSize == 0) {
+	  int[] results = insertStatement.executeBatch(); 
+	  for (int i=0; i < results.length; i++)
+	      if (results[i] != 1)
+		  System.err.println("Batch execute failed: " + results[i]);
+      } else {
+	  insertStatement.addBatch();
+      }
       if (result == 1) return SUCCESS;
       else return 1;
     } catch (SQLException e) {

@@ -11,7 +11,7 @@ import com.yahoo.ycsb.Utils;
  * hitting a particular slice constant, this is achieved by using an array of ZipfianGenerators for each power
  * of two leading to the number of clients.
  */
-public class FocusedZipfianGenerator extends IntegerGenerator 
+public class FocusedZipfianGenerator extends LongGenerator 
 {
 	ZipfianGenerator gen;
 	int genIndex;
@@ -47,16 +47,9 @@ public class FocusedZipfianGenerator extends IntegerGenerator
 	/**************************************************************************************************/
 	
 	/**
-	 * Return the next int in the sequence.
-	 */
-	@Override
-	public int nextInt() {
-		return (int)nextLong();
-	}
-
-	/**
 	 * Return the next long in the sequence.
 	 */
+	@Override
 	public long nextLong()
 	{
 		long ret=gen.nextLong();
@@ -69,7 +62,7 @@ public class FocusedZipfianGenerator extends IntegerGenerator
 		ret /= 2;
 		
 		ret=_offset + ret;
-		setLastInt((int)ret);
+		setLastLong(ret);
 		return ret;
 	}
 
