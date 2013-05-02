@@ -95,7 +95,7 @@ class StatusThread extends Thread
 		{
 			alldone=true;
 
-			int totalops=0;
+			long totalops=0;
 
 			//terminate this thread when all the worker threads are done
 			for (Thread t : _threads)
