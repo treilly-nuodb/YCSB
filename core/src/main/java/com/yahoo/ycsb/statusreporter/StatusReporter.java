@@ -16,7 +16,7 @@ public interface StatusReporter
      * @param measurements - output from Measurements.getMeasurements().getSummary() method; includes latency for any YCSB operations 
      *   (read, update, insert, delete, scan) that occur in this interval
      */
-    void report(long interval, int totalops, double curthroughput, String measurements);
+    void report(long interval, long totalops, double curthroughput, String measurements);
     
     /**
      * Clean up any resources and connections used by the reporter.

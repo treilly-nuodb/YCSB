@@ -34,7 +34,7 @@ public class HttpStatusReporter implements StatusReporter {
      * Where parms always include client, interval, totalops and tps;
      * and may include latency measures for read, update, insert, delete or scan.
      */
-    public void report(long interval, int totalops, double curthroughput, String measures) {
+    public void report(long interval, long totalops, double curthroughput, String measures) {
         String urlParameters = "client=" + _clientid + "&interval=" + interval + "&totalops=" + totalops + "&tps=" + curthroughput;
                                 
        String[] parts = Pattern.compile("]|\\[").split(measures.trim());
